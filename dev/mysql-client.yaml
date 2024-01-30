@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-client-pod
+  labels:
+    purpose: test-mysql-connection
+spec:
+  containers:
+  - name: mysql-client
+    image: mysql:5.7
+    command: ["sleep"]
+    args: ["3600"]
+    env:
+    - name: MYSQL_HOST
+      value: "mysql-server"  # Replace with your MySQL server service name
+    - name: MYSQL_USER
+      value: "exampleuser"  # Replace with your MySQL user
+    - name: MYSQL_PASSWORD
+      value: "examplepass"  # Replace with your MySQL password
+    - name: MYSQL_DATABASE
+      value: "exampledb"    # Replace with your MySQL database name, if needed
+
+
+
+
+
+

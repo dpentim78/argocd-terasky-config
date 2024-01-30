@@ -1,0 +1,64 @@
+# mysql-vault-service-resource-limit.yaml
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-credentials
+type: Opaque
+data:
+  username: eW91ci11c2VybmFtZQ==   # base64-encoded "your-username"
+  password: eW91ci1wYXNzd29yZA==   # base64-encoded "your-password"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.3
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: password
+        - name: MYSQL_DATABASE
+          value: "your-database"
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: username
+        ports:
+        - containerPort: 3306
+        resources:
+          limits:
+            cpu: 500m         # Maximum amount of CPU that the container can use
+            memory: 512Mi     # Maximum amount of memory that the container can use
+          requests:
+            cpu: 200m         # Amount of CPU guaranteed to the container
+            memory: 256Mi     # Amount of memory guaranteed to the container
